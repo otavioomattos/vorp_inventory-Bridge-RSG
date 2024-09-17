@@ -109,13 +109,13 @@ end)
 
 exports("addItem", function(source, item, amount, metadata, callback)
     if source then
-        exports['rsg-inventory']:AddItem(source, item, amount, false, metadata, nil)
+        return exports['rsg-inventory']:AddItem(source, item, amount, false, metadata, nil)
     end
 end)
 
 exports("subItem", function(source, item, amount, metadata, callback)
     if source then
-        exports['rsg-inventory']:RemoveItem(source, item, amount)
+        return exports['rsg-inventory']:RemoveItem(source, item, amount)
     end
 end)
 
@@ -308,13 +308,13 @@ local INV = {
 
     addItem = function(source, item, amount, metadata, callback)
         if source then
-            exports['rsg-inventory']:AddItem(source, item, amount, false, metadata, nil)
+            return exports['rsg-inventory']:AddItem(source, item, amount, false, metadata, nil)
         end
     end,
 
     subItem = function(source, item, amount, metadata, callback)
         if source then
-            exports['rsg-inventory']:RemoveItem(source, item, amount)
+            return exports['rsg-inventory']:RemoveItem(source, item, amount)
         end
     end,
 
