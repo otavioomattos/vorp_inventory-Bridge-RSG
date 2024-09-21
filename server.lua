@@ -62,7 +62,7 @@ end)
 
 exports("getItemCount", function(source, callback, item, metadata)
     local Player = Core.Functions.GetPlayer(source)
-    if source then
+    if Player then
         local itemCount = exports['rsg-inventory']:GetItemByName(source, item)
         local amount = itemCount and itemCount.amount or 0 
         if callback then
