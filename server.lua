@@ -9,16 +9,44 @@ exports("canCarryItem", function(source, item, amount, callback)
     end
 end)
 
+exports("canCarryItems", function(source, item, amount, callback)
+    if callback then
+        callback(true) 
+    else
+        return true    
+    end
+end)
+
 exports("getUserInventoryItems", function(source, callback)
     local Player = Core.Functions.GetPlayer(source) 
     local citizenId = Player.PlayerData.citizenid   
 
-    local items = Player.PlayerData.Items--exports['rsg-inventory']:LoadInventory(source, citizenId)
+    local items = exports['rsg-inventory']:LoadInventory(source, citizenId)
 
     if callback then
         callback(items) 
     else
         return items  
+    end
+end) 
+
+exports("getUserInventoryWeapons", function(source, callback)
+    local Player = Core.Functions.GetPlayer(source) 
+    local citizenId = Player.PlayerData.citizenid   
+
+    local items = exports['rsg-inventory']:LoadInventory(source, citizenId)
+    local weapons = {}
+
+    for _, item in pairs(items) do
+        if item.type == "weapon" then 
+            table.insert(weapons, item)
+        end
+    end
+
+    if callback then
+        callback(weapons) 
+    else
+        return weapons  
     end
 end)
 
@@ -208,16 +236,44 @@ local INV = {
         end
     end,
 
+    canCarryItems = function()
+        if callback then
+            callback(true) 
+        else
+            return true    
+        end
+    end,
+
     getUserInventoryItems = function(source, callback)
         local Player = Core.Functions.GetPlayer(source) 
         local citizenId = Player.PlayerData.citizenid   
-
-        local items = Player.PlayerData.Items--exports['rsg-inventory']:LoadInventory(source, citizenId)
-
+        
+        local items = exports['rsg-inventory']:LoadInventory(source, citizenId)
+        
         if callback then
             callback(items) 
         else
             return items  
+        end
+    end,
+
+    getUserInventoryWeapons = function(source, callback)
+        local Player = Core.Functions.GetPlayer(source) 
+        local citizenId = Player.PlayerData.citizenid   
+    
+        local items = exports['rsg-inventory']:LoadInventory(source, citizenId)
+        local weapons = {}
+    
+        for _, item in pairs(items) do
+            if item.type == "weapon" then 
+                table.insert(weapons, item)
+            end
+        end
+    
+        if callback then
+            callback(weapons) 
+        else
+            return weapons  
         end
     end,
 
