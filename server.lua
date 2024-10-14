@@ -17,6 +17,14 @@ exports("canCarryItems", function(source, item, amount, callback)
     end
 end)
 
+exports("canCarryAmountItem", function(player, amount, cb)
+    if cb then
+        cb(true) 
+    else
+        return true    
+    end
+end)
+
 exports("getUserInventoryItems", function(source, callback)
     local Player = Core.Functions.GetPlayer(source) 
     local citizenId = Player.PlayerData.citizenid   
@@ -88,11 +96,11 @@ exports("registerUsableItem", function(item, callback)
     end)
 end)
 
-exports("getItemCount", function(source, callback, item, metadata)
-    local Player = Core.Functions.GetPlayer(source)
-    if Player then
-        local itemCount = exports['rsg-inventory']:GetItemByName(source, item)
-        local amount = itemCount and itemCount.amount or 0 
+exports("getItemCount", function(source, item, callback)
+    if source then
+        print(item)
+        local itemCount = exports['rsg-inventory']:GetItemCount(source, item)
+        local amount = itemCount or 0 
         if callback then
             callback(amount)
         else
@@ -184,7 +192,8 @@ exports("openInventory", function(source, invId)
     local data = registeredInventories[invId]
     if data then
         local Weight = data.limit * 1000
-        TriggerClientEvent("vorp_inventory:OpenInventory", source, data.id, { maxweight = Weight, slots = data.limit })
+        local stashName = 'Stash_'..data.id
+        exports['rsg-inventory']:OpenInventory(source, stashName, { maxweight = Weight, slots = data.limit })
     else
         print("Inventário não registrado: " .. tostring(invId))
     end
@@ -222,7 +231,7 @@ end)
 
 exports("closeInventory", function(source, invId)
     if source then
-        TriggerClientEvent("rsg-inventory:client:closeinv", source)
+        TriggerClientEvent("rsg-inventory:client:closeInv", source)
     end
 end) 
 
@@ -236,9 +245,17 @@ local INV = {
         end
     end,
 
-    canCarryItems = function()
+    canCarryItems = function(source, item, amount, callback)
         if callback then
             callback(true) 
+        else
+            return true    
+        end
+    end,
+
+    canCarryAmountItem = function(player, amount, cb)
+        if cb then
+            cb(true) 
         else
             return true    
         end
@@ -316,10 +333,9 @@ local INV = {
     end,
 
     getItemCount = function(source, item, metadata, callback)
-        local Player = Core.Functions.GetPlayer(source)
         if source then
-            local itemCount = exports['rsg-inventory']:GetItemByName(source, item)
-            local amount = itemCount and itemCount.amount or 0 
+            local itemCount = exports['rsg-inventory']:GetItemCount(source, item)
+            local amount = itemCount or 0 
             if callback then
                 callback(amount)
             else
@@ -376,9 +392,8 @@ local INV = {
     end,
 
     setItemMetadata = function(source, itemId, metadata, amount, callback)
-        Print("setItemMetadata linha 140")
         if source then
-            local success = exports['rsg-inventory']:SetItemData(source, itemId, 'info', metadata)
+            exports['rsg-inventory']:SetItemData(source, itemId, 'info', metadata)
         end
     end,
 
@@ -409,7 +424,8 @@ local INV = {
         local data = registeredInventories[invId]
         if data then
             local Weight = data.limit * 1000
-            TriggerClientEvent("vorp_inventory:OpenInventory", source, data.id, { maxweight = Weight, slots = data.limit })
+            local stashName = 'Stash_'..data.id
+            exports['rsg-inventory']:OpenInventory(source, stashName, { maxweight = Weight, slots = data.limit })
         else
             print("Inventário não registrado: " .. tostring(invId))
         end
@@ -437,17 +453,11 @@ local INV = {
         if source then
             exports['rsg-inventory']:AddItem(source, weaponName, 1, false, nil, nil)
         end
-    end,
-
-    createWeapon = function(source, weaponName, ammo, components, comps, callback, serial, label, desc)
-        if source then
-            exports['rsg-inventory']:AddItem(source, weaponName, 1, false, nil, nil)
-        end
     end, 
 
     closeInventory = function(source, invId)
         if source then
-            TriggerClientEvent("rsg-inventory:client:closeinv", source)
+            TriggerClientEvent("rsg-inventory:client:closeInv", source)
         end
     end, 
 }
@@ -457,6 +467,9 @@ INV.RegisterUsableItem = registerUsableItem
 INV.registerUsableItem = registerUsableItem
 INV.closeInventory = CloseInventory
 INV.CloseInventory = closeInventory
+
+AddEventHandler("vorpCore:canCarryItems", INV.canCarryAmountItem)
+AddEventHandler("vorpCore:canCarryItem", INV.canCarryItem)
 
 exports("vorp_inventoryApi", function()
     return INV
