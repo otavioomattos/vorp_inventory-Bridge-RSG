@@ -58,7 +58,7 @@ exports("getUserInventoryWeapons", function(source, callback)
     end
 end)
 
-exports("registerUsableItem", function(item, callback)
+exports("RegisterUsableItem", function(item, callback)
     if not Core.Functions.CreateUseableItem then
         print("Erro: CreateUseableItem não está disponível!")
         return
@@ -126,7 +126,7 @@ exports("getItemContainingMetadata", function(source, callback, item, metadata)
         local item = exports['rsg-inventory']:GetItemByName(source, item)
         
         if callback then
-            callback(item.metadata) 
+            callback(item.info) 
         else
             return item  
         end
@@ -157,7 +157,6 @@ exports("subItem", function(source, item, amount, metadata, callback)
 end)
 
 exports("setItemMetadata", function(source, itemId, metadata, amount, callback)
-    Print("setItemMetadata linha 140")
     if source then
         local success = exports['rsg-inventory']:SetItemData(source, itemId, 'info', metadata)
     end
@@ -294,7 +293,7 @@ local INV = {
         end
     end,
 
-    registerUsableItem = function(item, callback)
+    RegisterUsableItem = function(item, callback)
         if not Core.Functions.CreateUseableItem then
             print("Erro: CreateUseableItem não está disponível!")
             return
@@ -460,13 +459,13 @@ local INV = {
             TriggerClientEvent("rsg-inventory:client:closeInv", source)
         end
     end, 
-}
 
-INV = {}
-INV.RegisterUsableItem = registerUsableItem
-INV.registerUsableItem = registerUsableItem
-INV.closeInventory = CloseInventory
-INV.CloseInventory = closeInventory
+    CloseInv = function(source)
+        if source then
+            TriggerClientEvent("rsg-inventory:client:closeInv", source)
+        end
+    end, 
+}
 
 AddEventHandler("vorpCore:canCarryItems", INV.canCarryAmountItem)
 AddEventHandler("vorpCore:canCarryItem", INV.canCarryItem)
